@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Shubham Phuke | Data Alchemist</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <!-- AOS Library for smooth scroll animations -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-deep: #050505;
+      --bg-card: #0c0c0c;
+      --bg-elevated: #111111;
+      --accent-primary: #ff3366;
+      --accent-secondary: #3a86ff;
+      --accent-glow: rgba(255, 51, 102, 0.4);
+      --text-primary: #f1f1f1;
+      --text-muted: #a0a0a0;
+      --border-subtle: rgba(255, 255, 255, 0.05);
+      --transition-smooth: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-deep);
+      color: var(--text-primary);
+      overflow-x: hidden;
+      line-height: 1.5;
+      cursor: default;
+    }
+
+    /* custom cursor only on desktop */
+    @media (min-width: 1024px) {
+      .custom-cursor {
+        width: 8px;
+        height: 8px;
+        background: var(--accent-primary);
+        border-radius: 50%;
+        position: fixed;
+        pointer-events: none;
+        z-index: 9999;
+        mix-blend-mode: difference;
+      }
+
+      .cursor-trail {
+        width: 32px;
+        height: 32px;
+        border: 1.5px solid var(--accent-primary);
+        border-radius: 50%;
+        position: fixed;
+        pointer-events: none;
+        z-index: 9998;
+        transition: all 0.12s ease-out;
+        opacity: 0.6;
+      }
+    }
+
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #0a0a0a;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--accent-primary);
+      border-radius: 10px;
+    }
+
+    .animated-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+      background: radial-gradient(circle at 20% 30%, rgba(255, 51, 102, 0.1), transparent 55%),
+                  radial-gradient(circle at 80% 70%, rgba(58, 134, 255, 0.07), transparent 60%);
+      pointer-events: none;
+    }
+
+    /* floating particles canvas */
+    #particles-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .glass-nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      padding: 1.2rem 5%;
+      backdrop-filter: blur(16px);
+      background: rgba(5, 5, 5, 0.7);
+      z-index: 1000;
+      transition: var(--transition-smooth);
+      border-bottom: 1px solid transparent;
+    }
+
+    .glass-nav.scrolled {
+      padding: 0.8rem 5%;
+      background: rgba(0, 0, 0, 0.92);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .nav-container {
+      max-width: 1300px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 1.7rem;
+      background: linear-gradient(135deg, #fff, var(--accent-primary));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+    .logo:hover { transform: scale(1.02); }
+
+    .nav-links {
+      display: flex;
+      gap: 2.2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-muted);
+      font-weight: 500;
+      font-size: 0.9rem;
+      transition: color 0.2s;
+      position: relative;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--accent-primary);
+      transition: width 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: white;
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    .btn-outline-glow {
+      background: rgba(255, 51, 102, 0.1);
+      border: 1px solid var(--accent-primary);
+      padding: 0.4rem 1.2rem;
+      border-radius: 30px;
+      color: white !important;
+    }
+
+    .btn-outline-glow::after {
+      display: none;
+    }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .hamburger span {
+      width: 26px;
+      height: 2px;
+      background: white;
+      transition: 0.3s;
+    }
+
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 120px 5% 80px;
+      position: relative;
+    }
+
+    .hero-grid {
+      max-width: 1300px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: center;
+    }
+
+    .badge-pulse {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255, 51, 102, 0.12);
+      padding: 0.4rem 1rem;
+      border-radius: 40px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      color: var(--accent-primary);
+      margin-bottom: 1.5rem;
+      border: 0.5px solid rgba(255, 51, 102, 0.3);
+      animation: softPulse 2s infinite;
+    }
+    @keyframes softPulse { 0% { box-shadow: 0 0 0 0 rgba(255,51,102,0.2); } 100% { box-shadow: 0 0 0 6px rgba(255,51,102,0); } }
+
+    .glow-text {
+      font-size: clamp(3rem, 7vw, 5.2rem);
+      font-weight: 800;
+      line-height: 1.1;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .glow-text span {
+      color: var(--accent-primary);
+      text-shadow: 0 0 12px var(--accent-glow);
+    }
+
+    .hero-desc {
+      color: var(--text-muted);
+      margin: 1.2rem 0 2rem;
+      font-size: 1.1rem;
+      max-width: 90%;
+    }
+
+    .cta-group {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      background: var(--accent-primary);
+      border: none;
+      padding: 0.9rem 2rem;
+      border-radius: 40px;
+      font-weight: 600;
+      color: white;
+      cursor: pointer;
+      transition: 0.2s;
+      box-shadow: 0 5px 20px rgba(255, 51, 102, 0.3);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      background: #ff1f55;
+      box-shadow: 0 12px 25px rgba(255, 51, 102, 0.4);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      padding: 0.9rem 2rem;
+      border-radius: 40px;
+      font-weight: 500;
+      color: white;
+      cursor: pointer;
+      transition: 0.2s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--accent-primary);
+      background: rgba(255, 51, 102, 0.05);
+      transform: translateY(-2px);
+    }
+
+    .avatar-orb {
+      position: relative;
+      width: 100%;
+      max-width: 380px;
+      margin: 0 auto;
+      cursor: pointer;
+      transition: transform 0.4s ease;
+    }
+    .avatar-orb:hover { transform: scale(1.02); }
+
+    .floating-sphere {
+      border-radius: 60% 40% 50% 50%/45% 50% 50% 55%;
+      animation: morph 10s ease-in-out infinite;
+      padding: 6px;
+      border: 2px solid rgba(255, 51, 102, 0.6);
+      box-shadow: 0 0 40px rgba(255, 51, 102, 0.3), inset 0 0 20px rgba(255, 51, 102, 0.05);
+      overflow: hidden;
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    .avatar-img {
+      width: 100%;
+      display: block;
+      object-fit: cover;
+      border-radius: inherit;
+      transition: 0.5s;
+    }
+
+    @keyframes morph {
+      0%, 100% { border-radius: 60% 40% 50% 50%/45% 50% 50% 55%; }
+      50% { border-radius: 40% 60% 45% 55%/55% 45% 55% 45%; }
+    }
+
+    .stats {
+      display: flex;
+      gap: 2rem;
+      margin: 2rem 0;
+    }
+
+    .stat-item h3 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--accent-primary);
+    }
+
+    .section {
+      padding: 90px 5%;
+      max-width: 1300px;
+      margin: 0 auto;
+    }
+
+    .section-tag {
+      color: var(--accent-primary);
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      letter-spacing: 3px;
+      margin-bottom: 0.8rem;
+      display: inline-block;
+    }
+
+    .section-title {
+      font-size: clamp(2rem, 4vw, 2.8rem);
+      font-weight: 700;
+      margin-bottom: 2rem;
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+    }
+
+    .about-card {
+      background: var(--bg-card);
+      border-radius: 28px;
+      padding: 2rem;
+      border: 1px solid var(--border-subtle);
+      transition: all 0.3s;
+    }
+    .about-card:hover {
+      border-color: var(--accent-primary);
+      transform: translateY(-8px);
+      box-shadow: 0 20px 30px -15px rgba(255,51,102,0.2);
+    }
+
+    .chip-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 1.5rem;
+    }
+
+    .chip {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 0.3rem 1rem;
+      border-radius: 40px;
+      font-size: 0.8rem;
+      transition: all 0.2s;
+    }
+    .chip:hover { background: rgba(255,51,102,0.2); transform: translateY(-2px); }
+
+    .skills-marquee {
+      background: var(--bg-elevated);
+      padding: 3rem 0;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .marquee-track {
+      display: inline-flex;
+      gap: 1.8rem;
+      animation: scroll 28s linear infinite;
+    }
+
+    .skill-badge {
+      background: #1a1a1a;
+      padding: 0.7rem 1.6rem;
+      border-radius: 60px;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 500;
+      border-left: 2px solid var(--accent-primary);
+      box-shadow: 0 5px 12px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s;
+    }
+    .skill-badge:hover { transform: scale(1.05); background: #252525; border-left-color: var(--accent-secondary); }
+
+    @keyframes scroll {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.8rem;
+    }
+
+    .project-tilt {
+      background: var(--bg-card);
+      border-radius: 24px;
+      padding: 1.5rem;
+      transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.2);
+      border: 1px solid var(--border-subtle);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    .project-tilt::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,51,102,0.1), transparent);
+      transition: left 0.6s;
+    }
+    .project-tilt:hover::before { left: 100%; }
+    .project-tilt:hover {
+      transform: translateY(-8px) scale(1.02);
+      border-color: var(--accent-primary);
+      box-shadow: 0 20px 30px -15px rgba(0, 0, 0, 0.5);
+    }
+
+    .timeline {
+      position: relative;
+      padding-left: 2rem;
+    }
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: 2.5rem;
+      transition: transform 0.3s;
+    }
+    .timeline-item:hover { transform: translateX(8px); }
+
+    .timeline-dot {
+      position: absolute;
+      left: -2rem;
+      top: 5px;
+      width: 12px;
+      height: 12px;
+      background: var(--accent-primary);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent-primary);
+      animation: pulse-dot 1.5s infinite;
+    }
+    @keyframes pulse-dot { 0% { opacity: 0.6; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1.2); } }
+
+    .contact-form {
+      background: var(--bg-card);
+      border-radius: 28px;
+      padding: 2rem;
+      border: 1px solid var(--border-subtle);
+      transition: all 0.3s;
+    }
+    .contact-form:focus-within { border-color: var(--accent-primary); box-shadow: 0 0 0 2px rgba(255,51,102,0.2); }
+
+    input, textarea {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-subtle);
+      padding: 1rem;
+      border-radius: 16px;
+      color: white;
+      font-family: inherit;
+      transition: 0.2s;
+    }
+
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .social-links-row {
+      display: flex;
+      gap: 1.2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 1rem 0;
+    }
+
+    /* responsive */
+    @media (max-width: 800px) {
+      .hero-grid, .about-grid {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+      .nav-links {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 70%;
+        height: 100vh;
+        background: #000000dd;
+        backdrop-filter: blur(30px);
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        transition: 0.4s;
+        z-index: 999;
+      }
+      .nav-links.open { right: 0; }
+      .hamburger { display: flex; z-index: 1001; }
+      .stats { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+<div class="animated-bg"></div>
+<canvas id="particles-canvas"></canvas>
+<div class="custom-cursor" id="cursorDot"></div>
+<div class="cursor-trail" id="cursorTrail"></div>
+
+<nav class="glass-nav" id="navbar">
+  <div class="nav-container">
+    <div class="logo">SHUBHAM.DATA</div>
+    <ul class="nav-links" id="navMenu">
+      <li><a href="#home">Home</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#contact" class="btn-outline-glow">Let's Talk</a></li>
+    </ul>
+    <div class="hamburger" id="hamburgerBtn"><span></span><span></span><span></span></div>
+  </div>
+</nav>
+
+<section id="home" class="hero">
+  <div class="hero-grid">
+    <div class="hero-left" data-aos="fade-up" data-aos-duration="800">
+      <div class="badge-pulse"><i class="fas fa-chart-line"></i> DATA ALCHEMIST</div>
+      <h1 class="glow-text">SHUBHAM<br><span>PHUKE</span></h1>
+      <p class="hero-desc">Turning raw chaos into crystal-clear insights. <strong>Python · Power BI · SQL · Freelance</strong></p>
+      <div class="stats">
+        <div class="stat-item"><h3 class="counter" data-target="6">0</h3><p>Projects+</p></div>
+        <div class="stat-item"><h3 class="counter" data-target="12">0</h3><p>Tech Tools</p></div>
+        <div class="stat-item"><h3 class="counter" data-target="83">0</h3><p>SSC %ile</p></div>
+      </div>
+      <div class="cta-group">
+        <a href="#projects" class="btn-primary"><i class="fas fa-rocket"></i> Explore Work</a>
+        <button class="btn-secondary" id="resumeBtn"><i class="fas fa-file-pdf"></i> Resume</button>
+      </div>
+    </div>
+    <div class="hero-right" data-aos="fade-left" data-aos-duration="800">
+      <div class="avatar-orb" id="profileAvatar">
+        <div class="floating-sphere">
+          <!-- Profile image placeholder: user can replace 'images/profile.jpg' with actual image path -->
+          <img class="avatar-img" src="images/profile.jpg" alt="Shubham Phuke">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="about" class="section">
+  <div class="section-tag" data-aos="fade-right">✦ ABOUT ME</div>
+  <div class="about-grid">
+    <div class="about-card" data-aos="flip-left" data-aos-duration="600">
+      <i class="fas fa-user-astronaut" style="font-size:2rem;color:var(--accent-primary)"></i>
+      <h3 style="margin:1rem 0 0.5rem">The data storyteller</h3>
+      <p style="color:var(--text-muted)">BCS Computer Science student, passionate about extracting gold from data. I've helped startups reduce churn by 15% and optimize costs with BI dashboards.</p>
+      <div class="chip-list"><span class="chip">🎯 Python (Pandas/NumPy)</span><span class="chip">📊 Power BI Expert</span><span class="chip">📈 SQL & ETL</span><span class="chip">🤖 Scikit-learn</span></div>
+    </div>
+    <div class="about-card" data-aos="flip-right" data-aos-duration="600">
+      <i class="fas fa-bolt" style="font-size:2rem;color:var(--accent-primary)"></i>
+      <h3 style="margin:1rem 0 0.5rem">Freelance & Creator</h3>
+      <p>Founder @classic_techies on YouTube. I build custom dashboards, automate reports, and help businesses make data-driven decisions remotely.</p>
+      <div class="chip-list"><span class="chip">🎬 Content Creator</span><span class="chip">🌍 Open for collab</span><span class="chip">🚀 Data consulting</span></div>
+    </div>
+  </div>
+</section>
+
+<div id="skills" class="skills-marquee">
+  <div class="marquee-track">
+    <span class="skill-badge"><i class="fab fa-python"></i> Python</span><span class="skill-badge"><i class="fas fa-chart-pie"></i> Power BI</span><span class="skill-badge"><i class="fas fa-database"></i> SQL</span><span class="skill-badge"><i class="fas fa-chart-line"></i> Pandas</span><span class="skill-badge"><i class="fas fa-brain"></i> ML basics</span><span class="skill-badge"><i class="fas fa-file-excel"></i> Excel</span><span class="skill-badge"><i class="fas fa-table"></i> Tableau</span><span class="skill-badge"><i class="fas fa-code"></i> Web scraping</span>
+    <span class="skill-badge"><i class="fab fa-python"></i> Python</span><span class="skill-badge"><i class="fas fa-chart-pie"></i> Power BI</span><span class="skill-badge"><i class="fas fa-database"></i> SQL</span><span class="skill-badge"><i class="fas fa-chart-line"></i> Pandas</span><span class="skill-badge"><i class="fas fa-brain"></i> ML basics</span><span class="skill-badge"><i class="fas fa-file-excel"></i> Excel</span><span class="skill-badge"><i class="fas fa-table"></i> Tableau</span><span class="skill-badge"><i class="fas fa-code"></i> Web scraping</span>
+  </div>
+</div>
+
+<section id="projects" class="section">
+  <div class="section-tag" data-aos="fade-up">⚡ FEATURED PROJECTS</div>
+  <h2 class="section-title" data-aos="fade-up">Real impact, <span style="color:var(--accent-primary)">real data</span></h2>
+  <div class="projects-grid">
+    <div class="project-tilt" data-aos="zoom-in" data-aos-delay="100" onclick="window.showToast('📈 Sales analysis boosted forecasting by 22%')"><i class="fas fa-chart-simple" style="font-size:2rem;color:var(--accent-primary)"></i><h3>Sales Intelligence Suite</h3><p style="color:var(--text-muted);margin:0.5rem 0">Python + Excel: interactive dashboard with predictive trends.</p><div style="display:flex;gap:8px;margin-top:1rem"><span class="chip">Pandas</span><span class="chip">Matplotlib</span></div></div>
+    <div class="project-tilt" data-aos="zoom-in" data-aos-delay="200" onclick="window.showToast('📉 Churn analysis reduced simulated churn by 15%')"><i class="fas fa-user-minus" style="font-size:2rem;color:var(--accent-primary)"></i><h3>Customer Churn Predictor</h3><p>ML model + SHAP analysis to identify at-risk customers & retention levers.</p><div><span class="chip">Scikit-learn</span><span class="chip">Seaborn</span></div></div>
+    <div class="project-tilt" data-aos="zoom-in" data-aos-delay="300" onclick="window.showToast('💰 Budget tracker saved 18% costs for SMBs')"><i class="fas fa-wallet" style="font-size:2rem;color:var(--accent-primary)"></i><h3>Financial Tracker (Power BI)</h3><p>Real-time budget vs actuals, dynamic DAX metrics, cost optimization insights.</p><div><span class="chip">Power BI</span><span class="chip">DAX</span></div></div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0">
+  <div class="section-tag" data-aos="fade-right">📌 JOURNEY</div>
+  <div class="timeline" data-aos="fade-left">
+    <div class="timeline-item"><div class="timeline-dot"></div><h3>BCS Computer Science</h3><p>Pursuing data analytics specialization | 2023 - Present</p></div>
+    <div class="timeline-item"><div class="timeline-dot"></div><h3>Freelance Data Analyst</h3><p>Built dashboards for e-commerce & finance clients | 2024+</p></div>
+    <div class="timeline-item"><div class="timeline-dot"></div><h3>YouTube @classic_techies</h3><p>2k+ subscribers, teaching data & tech tutorials</p></div>
+  </div>
+</section>
+
+<!-- SOCIAL LINKS with clickable links and tooltips -->
+<div style="background:linear-gradient(90deg,rgba(255,51,102,0.1),transparent);padding:2rem 5%;text-align:center">
+  <div class="social-links-row">
+    <a href="https://linkedin.com/in/shubham-phuke" target="_blank" rel="noopener noreferrer" class="btn-secondary" data-tooltip="Connect on LinkedIn"><i class="fab fa-linkedin"></i> LinkedIn</a>
+    <a href="https://github.com/shubhamphukepa" target="_blank" rel="noopener noreferrer" class="btn-secondary" data-tooltip="Explore GitHub"><i class="fab fa-github"></i> GitHub</a>
+    <a href="https://youtube.com/@classic_techies" target="_blank" rel="noopener noreferrer" class="btn-secondary" data-tooltip="Subscribe on YouTube"><i class="fab fa-youtube"></i> YouTube</a>
+    <a href="https://instagram.com/classic_techies" target="_blank" rel="noopener noreferrer" class="btn-secondary" data-tooltip="Follow on Instagram"><i class="fab fa-instagram"></i> Instagram</a>
+  </div>
+</div>
+
+<section id="contact" class="section">
+  <div class="section-tag" data-aos="fade-up">📬 CONNECT</div>
+  <div class="about-grid" style="gap:2rem">
+    <div data-aos="fade-right"><h3>Let's build something <span style="color:var(--accent-primary)">impactful</span></h3><p style="color:var(--text-muted);margin-top:1rem">Freelance, data mentorship, or just a chat — reach out.</p><div style="margin-top:1.5rem"><i class="fas fa-envelope" style="color:var(--accent-primary)"></i> sphukepatil@gmail.com</div><div><i class="fas fa-phone-alt"></i> +91 9421900829</div></div>
+    <div class="contact-form" data-aos="fade-left">
+      <input type="text" id="nameInput" placeholder="Full name">
+      <input type="email" id="emailInput" placeholder="Email" style="margin-top:1rem">
+      <textarea id="msgInput" rows="4" placeholder="Your message..." style="margin-top:1rem"></textarea>
+      <button id="sendMsgBtn" class="btn-primary" style="width:100%;margin-top:1.5rem;justify-content:center">Send Message <i class="fas fa-paper-plane"></i></button>
+      <div id="formFeedback" style="margin-top:1rem;font-size:0.8rem;text-align:center"></div>
+    </div>
+  </div>
+</section>
+
+<footer><p>© 2026 — Shubham Phuke | Data Alchemist & Creator | <span style="color:var(--accent-primary)">#TurnDataIntoGold</span></p></footer>
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+  (function() {
+    AOS.init({ once: false, mirror: false, duration: 700, offset: 80 });
+    
+    // Particles background animation
+    const canvas = document.getElementById('particles-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+    class Particle {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 2 + 0.8;
+        this.speedX = (Math.random() - 0.5) * 0.3;
+        this.speedY = (Math.random() - 0.5) * 0.2;
+        this.color = `rgba(255, 70, 120, ${Math.random() * 0.3 + 0.1})`;
+      }
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        if (this.x < 0) this.x = canvas.width;
+        if (this.x > canvas.width) this.x = 0;
+        if (this.y < 0) this.y = canvas.height;
+        if (this.y > canvas.height) this.y = 0;
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+      }
+    }
+    for (let i = 0; i < 60; i++) particles.push(new Particle());
+    function animateParticles() {
+      if (!ctx) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => { p.update(); p.draw(); });
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+
+    // Cursor effect desktop
+    if(window.innerWidth > 1024) {
+      const dot = document.getElementById('cursorDot');
+      const trail = document.getElementById('cursorTrail');
+      let mouseX = 0, mouseY = 0, trailX = 0, trailY = 0;
+      document.addEventListener('mousemove', e => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        if(dot) dot.style.transform = `translate(${mouseX - 4}px, ${mouseY - 4}px)`;
+      });
+      function animateTrail() {
+        if(trail) {
+          trailX += (mouseX - trailX) * 0.12;
+          trailY += (mouseY - trailY) * 0.12;
+          trail.style.transform = `translate(${trailX - 16}px, ${trailY - 16}px)`;
+        }
+        requestAnimationFrame(animateTrail);
+      }
+      animateTrail();
+    }
+
+    // Navbar scroll
+    window.addEventListener('scroll', () => {
+      const nav = document.getElementById('navbar');
+      if (nav) nav.classList.toggle('scrolled', window.scrollY > 40);
+    });
+
+    // Mobile menu toggle
+    const hamburger = document.getElementById('hamburgerBtn');
+    const navMenu = document.getElementById('navMenu');
+    if(hamburger && navMenu) {
+      hamburger.addEventListener('click', () => navMenu.classList.toggle('open'));
+      document.querySelectorAll('.nav-links a').forEach(link => link.addEventListener('click', () => navMenu.classList.remove('open')));
+    }
+
+    // Counters animation
+    const counters = document.querySelectorAll('.counter');
+    const counterObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if(entry.isIntersecting) {
+          const el = entry.target;
+          const target = parseInt(el.getAttribute('data-target'));
+          let current = 0;
+          const increment = target / 45;
+          const interval = setInterval(() => {
+            current += increment;
+            if(current >= target) {
+              el.innerText = target;
+              clearInterval(interval);
+            } else {
+              el.innerText = Math.floor(current);
+            }
+          }, 20);
+          counterObserver.unobserve(el);
+        }
+      });
+    }, { threshold: 0.6 });
+    counters.forEach(c => counterObserver.observe(c));
+
+    window.showToast = function(msg, duration = 2800) {
+      let toast = document.getElementById('dynamicToast');
+      if(!toast) {
+        toast = document.createElement('div');
+        toast.id = 'dynamicToast';
+        toast.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#ff3366;color:white;padding:12px 24px;border-radius:40px;z-index:9999;font-weight:600;box-shadow:0 5px 20px rgba(0,0,0,0.4);font-family:Inter;pointer-events:none;backdrop-filter:blur(5px);';
+        document.body.appendChild(toast);
+      }
+      toast.textContent = msg;
+      toast.style.opacity = '1';
+      setTimeout(() => toast.style.opacity = '0', duration);
+    };
+
+    // Resume button toast
+    document.getElementById('resumeBtn')?.addEventListener('click', () => window.showToast('📄 Resume ready — Please reach out via email or LinkedIn!'));
+
+    // Contact form
+    const sendBtn = document.getElementById('sendMsgBtn');
+    const nameInput = document.getElementById('nameInput');
+    const emailInput = document.getElementById('emailInput');
+    const msgInput = document.getElementById('msgInput');
+    const feedbackDiv = document.getElementById('formFeedback');
+    if(sendBtn) {
+      sendBtn.addEventListener('click', () => {
+        const name = nameInput?.value.trim() || '';
+        const email = emailInput?.value.trim() || '';
+        const message = msgInput?.value.trim() || '';
+        if(!name || !email || !message) {
+          feedbackDiv.innerHTML = '⚠️ All fields required.';
+          feedbackDiv.style.color = '#ff8888';
+          return;
+        }
+        if(!email.includes('@') || !email.includes('.')) {
+          feedbackDiv.innerHTML = '📧 Please enter a valid email address.';
+          feedbackDiv.style.color = '#ff8888';
+          return;
+        }
+        feedbackDiv.innerHTML = `✨ Thanks ${name}! I'll reply within 24h.`;
+        feedbackDiv.style.color = '#88ff88';
+        if(nameInput) nameInput.value = '';
+        if(emailInput) emailInput.value = '';
+        if(msgInput) msgInput.value = '';
+        window.showToast('📨 Message sent! (demo simulation)');
+        setTimeout(() => { if(feedbackDiv) feedbackDiv.innerHTML = ''; }, 4000);
+      });
+    }
+
+    // Smooth anchor scroll
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        const href = this.getAttribute('href');
+        if(href && href !== '#') {
+          e.preventDefault();
+          const target = document.querySelector(href);
+          if(target) target.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    });
+
+    // Profile picture click redirect (example: LinkedIn)
+    const profileAvatarDiv = document.getElementById('profileAvatar');
+    if(profileAvatarDiv) {
+      profileAvatarDiv.style.cursor = 'pointer';
+      profileAvatarDiv.addEventListener('click', () => {
+        window.open('https://linkedin.com/in/shubham-phuke', '_blank');
+        window.showToast('🔗 Connect on LinkedIn!');
+      });
+    }
+
+    // Add hover animations for social links tooltip style
+    document.querySelectorAll('.social-links-row a').forEach(link => {
+      link.addEventListener('click', (e) => { /* no extra action, already target _blank */ });
+    });
+  })();
+</script>
+</body>
+</html>
